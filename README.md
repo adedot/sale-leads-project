@@ -7,10 +7,13 @@ To install the dependencies, run:
 
 TODO Add argument to get file. Use default file if no file argument
 
-TODO Add python script to convert json to csv
 
-TODO Add shell script to run two files
+## To convert json to csv
+python json_to_csv_converter.py test.json
+
+## To create json and convert json to csv file, run the following:
 
 chmod a+x sales.sh
+./sales.sh
 
 
