@@ -67,6 +67,7 @@ def request(host, path, url_params=None):
 
     conn = urllib2.urlopen(signed_url, None)
     try:
+        # Convert json string to json
         response = json.loads(conn.read())
     finally:
         conn.close()
@@ -135,10 +136,8 @@ def query_api(term, location):
         business_lead['phone'] = business['phone'] if business.get("phone") else ""
         business_lead['url']= business['url'] if business.get("url") else ""
 
-        line = json.dumps(business_lead)#.replace("u'", "'")#.replace("'","\"").replace("O\"","O'")
-
-       # line = re.sub("\b\"")
-        #line = unicodedata.normalize('NFKD', line).encode('ascii', 'ignore')
+        # Converts json to string
+        line = json.dumps(business_lead)
 
         leads_file.write(line+"\n")
 
