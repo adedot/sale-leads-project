@@ -13,6 +13,8 @@ import urllib
 import urllib2
 
 import oauth2
+import re
+import unicodedata
 
 
 API_HOST = 'api.yelp.com'
@@ -121,19 +123,24 @@ def query_api(term, location):
         len(businesses)
     )
 
-    leads_file = open('test-2.json', 'wb+')
+    leads_file = open('test.json', 'wb+')
 
 
     for business in businesses:
 
-        business_lead = business['location']
+        business_lead = business['location'] if business.get("location") else ""
 
 
-        business_lead['name'] = business['name']
+        business_lead['name'] = business['name'] if business.get("name") else ""
         business_lead['phone'] = business['phone'] if business.get("phone") else ""
-        business_lead['url']= business['url']
+        business_lead['url']= business['url'] if business.get("url") else ""
 
-        leads_file.write(str(business_lead).replace("u\"", "\"").replace("u'", "'").replace("'","\"").replace("O\"","O'")+"\n")
+        line = json.dumps(business_lead)#.replace("u'", "'")#.replace("'","\"").replace("O\"","O'")
+
+       # line = re.sub("\b\"")
+        #line = unicodedata.normalize('NFKD', line).encode('ascii', 'ignore')
+
+        leads_file.write(line+"\n")
 
 
 def main():

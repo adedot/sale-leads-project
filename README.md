@@ -11,3 +11,6 @@ TODO Add python script to convert json to csv
 
 TODO Add shell script to run two files
 
+chmod a+x sales.sh
+
+
