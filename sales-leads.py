@@ -1,7 +1,7 @@
+
 __author__ = 'Adetola'
-
 """
-
+Uses to YELP API to get search results and
 
 """
 
@@ -18,11 +18,14 @@ import unicodedata
 
 
 API_HOST = 'api.yelp.com'
-DEFAULT_TERM = 'nonprofits'
+DEFAULT_TERM = 'transportation'
 DEFAULT_LOCATION = 'Washington, DC'
 SEARCH_LIMIT = 20
 SEARCH_PATH = '/v2/search/'
 BUSINESS_PATH = '/v2/business/'
+DEFAULT_FILE = 'test.json'
+DEFAULT_TOTAL = 20
+
 
 # OAuth credential placeholders that must be filled in by users.
 CONSUMER_KEY = '85_UhVhnDO4VfffFxcHsEw'
@@ -88,7 +91,9 @@ def search(term, location):
     url_params = {
         'term': term.replace(' ', '+'),
         'location': location.replace(' ', '+'),
-        'limit': SEARCH_LIMIT
+        'limit': SEARCH_LIMIT,
+        'offset': DEFAULT_TOTAL
+
     }
     return request(API_HOST, SEARCH_PATH, url_params=url_params)
 
@@ -124,7 +129,7 @@ def query_api(term, location):
         len(businesses)
     )
 
-    leads_file = open('test.json', 'wb+')
+    leads_file = open(DEFAULT_FILE, 'wb+')
 
 
     for business in businesses:
@@ -147,6 +152,10 @@ def main():
 
     parser.add_argument('-q', '--term', dest='term', default=DEFAULT_TERM, type=str, help='Search term (default: %(default)s)')
     parser.add_argument('-l', '--location', dest='location', default=DEFAULT_LOCATION, type=str, help='Search location (default: %(default)s)')
+    parser.add_argument('-f', '--file', dest='file', default=DEFAULT_FILE, type=str, help='Search location (default: %(default)s)')
+    parser.add_argument('-t', '--total', dest='total', default=DEFAULT_TOTAL, type=int, help='Total Number of Results (default: %(default)d)')
+
+
 
     input_values = parser.parse_args()
 
