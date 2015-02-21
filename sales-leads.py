@@ -15,6 +15,7 @@ import urllib2
 import oauth2
 import re
 import unicodedata
+import math
 
 
 API_HOST = 'api.yelp.com'
@@ -24,7 +25,7 @@ SEARCH_LIMIT = 20
 SEARCH_PATH = '/v2/search/'
 BUSINESS_PATH = '/v2/business/'
 DEFAULT_FILE = 'test.json'
-DEFAULT_TOTAL = 20
+DEFAULT_TOTAL = 61
 
 
 # OAuth credential placeholders that must be filled in by users.
@@ -77,7 +78,7 @@ def request(host, path, url_params=None):
 
     return response
 
-def search(term, location):
+def search(term, location, offset):
     """Query the Search API by a search term and location.
 
     Args:
@@ -92,7 +93,7 @@ def search(term, location):
         'term': term.replace(' ', '+'),
         'location': location.replace(' ', '+'),
         'limit': SEARCH_LIMIT,
-        'offset': DEFAULT_TOTAL
+        'offset': offset
 
     }
     return request(API_HOST, SEARCH_PATH, url_params=url_params)
@@ -117,34 +118,48 @@ def query_api(term, location):
         term (str): The search term to query.
         location (str): The location of the business to query.
     """
-    response = search(term, location)
-
-    businesses = response.get('businesses')
-
-    if not businesses:
-        print 'No businesses for {0} in {1} found.'.format(term, location)
-        return
-
-    print '{0} businesses found" ...'.format(
-        len(businesses)
-    )
 
     leads_file = open(DEFAULT_FILE, 'wb+')
+    number_of_searches = int(math.ceil(DEFAULT_TOTAL/20))
 
 
-    for business in businesses:
+    for search_number in xrange(number_of_searches):
 
-        business_lead = business['location'] if business.get("location") else ""
+        offset = (search_number - 1 ) * DEFAULT_TOTAL
+        if(offset < 1):
+            response = search(term, location, 1)
+        else:
+            response = search(term, location, offset)
 
 
-        business_lead['name'] = business['name'] if business.get("name") else ""
-        business_lead['phone'] = business['phone'] if business.get("phone") else ""
-        business_lead['url']= business['url'] if business.get("url") else ""
 
-        # Converts json to string
-        line = json.dumps(business_lead)
 
-        leads_file.write(line+"\n")
+        businesses = response.get('businesses')
+
+        if not businesses:
+            print 'No businesses for {0} in {1} found.'.format(term, location)
+            return
+
+        print '{0} businesses found" ...'.format(
+            len(businesses)
+        )
+
+
+
+
+        for business in businesses:
+
+            business_lead = business['location'] if business.get("location") else ""
+
+
+            business_lead['name'] = business['name'] if business.get("name") else ""
+            business_lead['phone'] = business['phone'] if business.get("phone") else ""
+            business_lead['url']= business['url'] if business.get("url") else ""
+
+            # Converts json to string
+            line = json.dumps(business_lead)
+
+            leads_file.write(line+"\n")
 
 
 def main():
